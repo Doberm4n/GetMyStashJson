@@ -23,3 +23,5 @@ test*
 /test2
 *.txt
 *.bat
+*.log
+
