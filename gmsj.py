@@ -11,58 +11,69 @@ import stash_values
 version = '0.9.0'
 link = 'https://github.com/Doberm4n/POEStashJsonViewer'
 
-def getStash(league, accountName, delay, driverPath, profilePath):
-    if not verify():
-        return
-    if checkChromeIsRunning():
-        return
+class getStash():
 
-    #return
+    def getStashJson(self, league, accountName, delay, driverPath, profilePath):
+        if not verify():
+            return
+        if self.checkChromeIsRunning():
+            return
 
-    options = webdriver.ChromeOptions()
-    options.add_argument('user-data-dir=' + profilePath) #Path to your chrome profile
-    driver = webdriver.Chrome(executable_path=driverPath, chrome_options=options)
+        #return
+        try:
+            print '\nRunning Chrome browser...'
 
-    #open first tab json
-    url = stash_values.urlStashIndex[0] + str(0) + stash_values.urlStashIndex[1] +str(league) + stash_values.urlStashIndex[2] + str(accountName)
-    print 'Opening url: ' + url
-    driver.get(url)
-    pre = driver.find_element_by_tag_name("pre").text
-    data = json.loads(pre)
-    stashCount = data['numTabs']
-    print 'Stash tabs count: ' + str(stashCount) + '\n'
-    writeJson(data, league, 0)
+            options = webdriver.ChromeOptions()
+            options.add_argument('user-data-dir=' + profilePath) #Path to your chrome profile
+            driver = webdriver.Chrome(executable_path=driverPath, chrome_options=options)
 
-    #open next tab jsons
-    for i in range(stashCount):
-        url = stash_values.urlStashIndex[0] + str(i) + stash_values.urlStashIndex[1] + str(league) + stash_values.urlStashIndex[2] + str(accountName)
-        print "Delay: " + str(delay) + ' sec'
-        time.sleep(delay)
-        print 'Processing tab: ' + str(i)
-        print 'Opening url: ' + url
-        driver.get(url)
-        pre = driver.find_element_by_tag_name("pre").text
-        data = json.loads(pre)
-        #stashCount = data['numTabs']
-        writeJson(data, league, i)
+            #open first tab json
+            url = stash_values.urlStashIndex[0] + str(0) + stash_values.urlStashIndex[1] +str(league) + stash_values.urlStashIndex[2] + str(accountName)
+            print 'Opening url: ' + url
+            driver.get(url)
+            pre = driver.find_element_by_tag_name("pre").text
+            data = json.loads(pre)
+            stashCount = data['numTabs']
+            print 'Stash tabs count: ' + str(stashCount) + '\n'
+            self.writeJson(data, league, 0)
 
-    driver.quit()
+            #open next tab jsons
+            for i in range(stashCount):
+                url = stash_values.urlStashIndex[0] + str(i) + stash_values.urlStashIndex[1] + str(league) + stash_values.urlStashIndex[2] + str(accountName)
+                print "Delay: " + str(delay) + ' sec'
+                time.sleep(delay)
+                print 'Processing tab: ' + str(i)
+                print 'Opening url: ' + url
+                driver.get(url)
+                pre = driver.find_element_by_tag_name("pre").text
+                data = json.loads(pre)
+                #stashCount = data['numTabs']
+                self.writeJson(data, league, i)
 
-def writeJson(dump, league, stashNumber):
-    try:
-        with open(str(stashNumber + 1) + '_' + str(league) +'.json', 'w') as outfile:
-            print 'Writing json file: ' + str(stashNumber + 1) + '_' + str(league) + '.json'
-            json.dump(dump, outfile)
-            print 'Saved: ' + str(stashNumber + 1) + '_' + str(league) + '.json\n'
-    except Exception, e:
-            print "Error: " + str(e)
+            driver.quit()
 
-def checkChromeIsRunning():
-    for pid in psutil.pids():
-        p = psutil.Process(pid)
-        if p.name() == "chrome.exe":
-            print '\nPlease close Chrome browser before running this app'
-            return True
+        except Exception, e:
+                print "Error: " + str(e)
+        except KeyboardInterrupt:
+            print 'Exit... (Keyboard Interrupt)'
+            driver.quit()
+            pass
+
+    def writeJson(self, dump, league, stashNumber):
+        try:
+            with open(str(stashNumber + 1) + '_' + str(league) +'.json', 'w') as outfile:
+                print 'Writing json file: ' + str(stashNumber + 1) + '_' + str(league) + '.json'
+                json.dump(dump, outfile)
+                print 'Saved: ' + str(stashNumber + 1) + '_' + str(league) + '.json\n'
+        except Exception, e:
+                print "Error: " + str(e)
+
+    def checkChromeIsRunning(self):
+        for pid in psutil.pids():
+            p = psutil.Process(pid)
+            if p.name() == "chrome.exe":
+                print '\nPlease close Chrome browser before running this app'
+                return True
 
 
 def main(argv):
@@ -85,7 +96,8 @@ def main(argv):
     config = loadConfig()
 
     if config:
-        getStash(league, accountName, delay, config['chromedriver_path'], config['user_profile_path'])
+        getStashInstance = getStash()
+        getStashInstance.getStashJson(league, accountName, delay, config['chromedriver_path'], config['user_profile_path'])
 
 def loadConfig():
     try:
@@ -113,4 +125,8 @@ def verify():
     return res
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    except KeyboardInterrupt:
+        print 'Exit... (Keyboard Interrupt)'
+        sys.exit(2)
