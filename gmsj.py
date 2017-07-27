@@ -98,19 +98,18 @@ def loadConfig():
 def verify():
   print '\nChecking config...'
   data = loadConfig()
-  res = False
+  res = True
   if data:
     if not data['chromedriver_path'] or not os.path.isfile(data['chromedriver_path']):
         print 'Wrong chromedriver_path'
+        res = False
     else:
         print 'chromedriver_path defined'
-        res = True
     if not data['user_profile_path'] or not os.path.isdir(data['user_profile_path']):
         print 'Wrong user_profile_path'
         res = False
     else:
         print 'user_profile_path defined'
-        res = True
     return res
 
 if __name__ == "__main__":
