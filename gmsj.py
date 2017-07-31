@@ -27,6 +27,8 @@ class getStash():
             options.add_argument('user-data-dir=' + profilePath) #Path to your chrome profile
             driver = webdriver.Chrome(executable_path=driverPath, chrome_options=options)
 
+            time.sleep(5)
+
             #open first tab json
             url = stash_values.urlStashIndex[0] + str(0) + stash_values.urlStashIndex[1] +str(league) + stash_values.urlStashIndex[2] + str(accountName)
             print 'Opening url: ' + url
