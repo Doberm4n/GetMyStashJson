@@ -27,6 +27,7 @@ class getStash():
             options.add_argument('user-data-dir=' + profilePath) #Path to your chrome profile
             driver = webdriver.Chrome(executable_path=driverPath, chrome_options=options)
 
+            print "\nDelay: " + str(delay) + ' sec'
             time.sleep(5)
 
             #open first tab json
@@ -40,16 +41,15 @@ class getStash():
             self.writeJson(data, league, 0)
 
             #open next tab jsons
-            for i in range(stashCount):
+            for i in range(1, stashCount):
                 url = stash_values.urlStashIndex[0] + str(i) + stash_values.urlStashIndex[1] + str(league) + stash_values.urlStashIndex[2] + str(accountName)
                 print "Delay: " + str(delay) + ' sec'
                 time.sleep(delay)
-                print 'Processing tab: ' + str(i)
+                print 'Processing tab: ' + str(i+1)
                 print 'Opening url: ' + url
                 driver.get(url)
                 pre = driver.find_element_by_tag_name("pre").text
                 data = json.loads(pre)
-                #stashCount = data['numTabs']
                 self.writeJson(data, league, i)
 
             driver.quit()
@@ -83,6 +83,8 @@ def main(argv):
     print 'version: ' + str(version)
     print '(' + link + ')'
     delay = 5
+    league = None
+    accountName = None
     try:
         opts, args = getopt.getopt(argv,"l:a:d:",["league", "accountName", "delay"])
     except getopt.GetoptError:
@@ -95,6 +97,13 @@ def main(argv):
          accountName = str(arg)
       elif opt in ("-d", "--delay"):
          delay = int(arg)
+
+    if not league:
+        print '\nLeague not specified'
+        sys.exit(2)
+    if not accountName:
+        print '\nAccount name not specified'
+        sys.exit(2)
 
     config = loadConfig()
 
