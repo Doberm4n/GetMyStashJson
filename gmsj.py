@@ -8,6 +8,21 @@ from selenium import webdriver
 import time
 import stash_values
 
+def check_process(process):
+  import re
+  import subprocess
+
+  returnprocess = False
+  s = subprocess.Popen(["ps", "ax"],stdout=subprocess.PIPE)
+  for x in s.stdout:
+      if re.search(process, x):
+          returnprocess = True
+
+  if returnprocess == False:
+      print 'no process executing'
+  if returnprocess == True:
+      print 'process executing'
+
 version = '0.9.0'
 link = 'https://github.com/Doberm4n/POEStashJsonViewer'
 
@@ -97,6 +112,8 @@ def main(argv):
          accountName = str(arg)
       elif opt in ("-d", "--delay"):
          delay = int(arg)
+
+    check_process('chrome.exe')
 
     if not league:
         print '\nLeague not specified'
