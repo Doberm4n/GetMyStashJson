@@ -18,7 +18,7 @@ test*
 *.db
 *.csv
 *.json
-!/Config/getMyStashJsonConfig.json
+/Config/getMyStashJsonConfig.json
 /test
 /test2
 *.txt
