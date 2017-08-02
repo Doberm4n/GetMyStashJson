@@ -88,7 +88,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"l:a:d:",["league", "accountName", "delay"])
     except getopt.GetoptError:
-       print 'Usage: -l <league> -a <account name> -d <delay>'
+       print 'Usage: -l <league> -a <account name> -d <delay>(default: 5sec)'
        sys.exit(2)
     for opt, arg in opts:
       if opt in ("-l", "--league"):
@@ -100,9 +100,11 @@ def main(argv):
 
     if not league:
         print '\nLeague not specified'
+        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec)'
         sys.exit(2)
     if not accountName:
         print '\nAccount name not specified'
+        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec)'
         sys.exit(2)
 
     config = loadConfig()
