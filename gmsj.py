@@ -24,7 +24,7 @@ def check_process(process):
       print 'process executing'
 
 version = '0.9.0'
-link = 'https://github.com/Doberm4n/POEStashJsonViewer'
+link = 'https://github.com/Doberm4n/GetMyStashJson'
 
 class getStash():
 
@@ -34,7 +34,6 @@ class getStash():
         if self.checkChromeIsRunning():
             return
 
-        #return
         try:
             print '\nRunning Chrome browser...'
 
