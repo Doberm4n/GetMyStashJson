@@ -82,6 +82,7 @@ def main(argv):
     print '\nGetMyStashJson for PoE'
     print 'version: ' + str(version)
     print '(' + link + ')'
+    delay = 5
     try:
         opts, args = getopt.getopt(argv,"l:a:d:",["league", "accountName", "delay"])
     except getopt.GetoptError:
