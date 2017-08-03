@@ -14,7 +14,7 @@ link = 'https://github.com/Doberm4n/GetMyStashJson'
 
 class getStash():
 
-    def getStashJson(self, league, accountName, delay, driverPath, profilePath):
+    def getStashJson(self, league, accountName, character, delay, driverPath, profilePath):
         if not verify():
             return
         if self.checkChromeIsRunning():
@@ -29,6 +29,15 @@ class getStash():
 
             print "\nDelay: " + str(delay) + ' sec'
             time.sleep(5)
+
+            if character:
+                url = stash_values.urlCharacter[0] + str(character) + stash_values.urlCharacter[1] + str(accountName)
+                print 'Opening url: ' + url
+                driver.get(url)
+                pre = driver.find_element_by_tag_name("pre").text
+                data = json.loads(pre)
+                self.writeJson(data, character, 0)
+                return
 
             #open first tab json
             url = stash_values.urlStashIndex[0] + str(0) + stash_values.urlStashIndex[1] +str(league) + stash_values.urlStashIndex[2] + str(accountName)
@@ -61,12 +70,12 @@ class getStash():
             driver.quit()
             pass
 
-    def writeJson(self, dump, league, stashNumber):
+    def writeJson(self, dump, name, stashNumber):
         try:
-            with open(str(stashNumber + 1) + '_' + str(league) +'.json', 'w') as outfile:
-                print 'Writing json file: ' + str(stashNumber + 1) + '_' + str(league) + '.json'
+            with open(str(stashNumber + 1) + '_' + str(name) +'.json', 'w') as outfile:
+                print 'Writing json file: ' + str(stashNumber + 1) + '_' + str(name) + '.json'
                 json.dump(dump, outfile)
-                print 'Saved: ' + str(stashNumber + 1) + '_' + str(league) + '.json\n'
+                print 'Saved: ' + str(stashNumber + 1) + '_' + str(name) + '.json\n'
         except Exception, e:
                 print "Error: " + str(e)
 
@@ -85,10 +94,11 @@ def main(argv):
     delay = 5
     league = None
     accountName = None
+    character = None
     try:
-        opts, args = getopt.getopt(argv,"l:a:d:",["league", "accountName", "delay"])
+        opts, args = getopt.getopt(argv,"c:l:a:d:",["character", "league", "accountName", "delay"])
     except getopt.GetoptError:
-       print 'Usage: -l <league> -a <account name> -d <delay>(default: 5sec)'
+       print 'Usage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character>'
        sys.exit(2)
     for opt, arg in opts:
       if opt in ("-l", "--league"):
@@ -97,12 +107,14 @@ def main(argv):
          accountName = str(arg)
       elif opt in ("-d", "--delay"):
          delay = int(arg)
+      elif opt in ("-c", "--character"):
+         character = str(arg)
 
-    if not league:
+    if not league and not character:
         print '\nLeague not specified'
         print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec)'
         sys.exit(2)
-    if not accountName:
+    if not accountName and not character:
         print '\nAccount name not specified'
         print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec)'
         sys.exit(2)
@@ -111,7 +123,7 @@ def main(argv):
 
     if config:
         getStashInstance = getStash()
-        getStashInstance.getStashJson(league, accountName, delay, config['chromedriver_path'], config['user_profile_path'])
+        getStashInstance.getStashJson(league, accountName, character, delay, config['chromedriver_path'], config['user_profile_path'])
 
 def loadConfig():
     try:
