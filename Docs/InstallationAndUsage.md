@@ -37,9 +37,12 @@ pip install -U selenium
 -l <league> -a <account name>
 ```
 
-Example:
+Examples:
 ```
 gmsj.py -l Standard -a MyPoEAccountName
 ```
-
+If you want to save character inventory, use this:
+```
+gmsj.py -c MyCharacterName -a MyPoEAccountName 
+```
 and wait until json data is saved for each Stash Tab in separate .json files in sources folder.
