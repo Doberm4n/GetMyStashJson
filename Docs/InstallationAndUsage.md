@@ -41,7 +41,7 @@ Examples:
 ```
 gmsj.py -l Standard -a MyPoEAccountName
 ```
-If you want to save character inventory, use this:
+ If you want to save character inventory, use this:
 ```
 gmsj.py -c MyCharacterName -a MyPoEAccountName 
 ```
