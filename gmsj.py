@@ -112,11 +112,11 @@ def main(argv):
 
     if not league and not character:
         print '\nLeague not specified'
-        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec)'
+        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character>'
         sys.exit(2)
     if not accountName and not character:
         print '\nAccount name not specified'
-        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec)'
+        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character>'
         sys.exit(2)
 
     config = loadConfig()
