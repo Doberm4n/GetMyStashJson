@@ -34,7 +34,7 @@ pip install -U selenium
 
 9. run gmsj.py (from downloaded sources folder) from console with the following args:
 ```
--l <league> -a <account name>
+-l <league> -a <account name> (optional -c <character>)
 ```
 
 Examples:
