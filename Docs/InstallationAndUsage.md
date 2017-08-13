@@ -34,7 +34,7 @@ pip install -U selenium
 
 9. run gmsj.py (from downloaded sources folder) from console with the following args:
 ```
--l <league> -a <account name> (optional -c <character>)
+-l <league> -a <account name> (optional -c <character>) -r <index range or specific index/indexes> (example: -r "[1-5, 7, 1]")
 ```
 
 Examples:
@@ -45,4 +45,8 @@ gmsj.py -l Standard -a MyPoEAccountName
 ```
 gmsj.py -c MyCharacterName -a MyPoEAccountName 
 ```
-and wait until json data is saved for each Stash Tab in separate .json files in sources folder.
+- To get stash tabs with indexes 0, 2 to 5, 11 and 25 to 50, use this:
+```
+gmsj.py -c MyCharacterName -a MyPoEAccountName -r "[0, 2-5, 11, 25-50]"
+```
+and wait until json data is saved for each Stash Tab in separate .json files in sources\outputJson folder.

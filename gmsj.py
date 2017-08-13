@@ -9,16 +9,23 @@ import time
 import stash_values
 
 
-version = '0.9.0'
+version = '0.9.1'
 link = 'https://github.com/Doberm4n/GetMyStashJson'
 
 class getStash():
 
-    def getStashJson(self, league, accountName, character, delay, driverPath, profilePath):
+    def getStashJson(self, league, accountName, character, delay, driverPath, profilePath, indexRange):
+        driver = None
+
         if not verify():
             return
         if self.checkChromeIsRunning():
-            return
+            if query_yes_no("\nClose now?"):
+                os.system("taskkill /im chrome.exe /f >nul 2>&1")
+                print "\nComplete"
+            else:
+                print "\nExit"
+                return
 
         try:
             print '\nRunning Chrome browser...'
@@ -26,6 +33,8 @@ class getStash():
             options = webdriver.ChromeOptions()
             options.add_argument('user-data-dir=' + profilePath) #Path to your chrome profile
             driver = webdriver.Chrome(executable_path=driverPath, chrome_options=options)
+
+            print '\nPlease do not interact with browser tab, where JSON data is loading'
 
             print "\nDelay: " + str(delay) + ' sec'
             time.sleep(5)
@@ -37,6 +46,35 @@ class getStash():
                 pre = driver.find_element_by_tag_name("pre").text
                 data = json.loads(pre)
                 self.writeJson(data, character, 0)
+                driver.quit()
+                print "\nComplete"
+                return
+
+            if indexRange:
+                indexRange = indexRange.replace('[', '').replace(']', '').split(',')
+                for i in range(len(indexRange)):
+                    if '-' in indexRange[i]:
+                        temp = indexRange[i].split('-')
+                        for j in range(int(temp[0]), int(temp[1]) + 1):
+                            url = stash_values.urlStashIndex[0] + str(j) + stash_values.urlStashIndex[1] +str(league) + stash_values.urlStashIndex[2] + str(accountName)
+                            print 'Opening url: ' + url
+                            driver.get(url)
+                            pre = driver.find_element_by_tag_name("pre").text
+                            data = json.loads(pre)
+                            self.writeJson(data, league, j-1)
+                            print "Delay: " + str(delay) + ' sec'
+                            time.sleep(delay)
+                    else:
+                        url = stash_values.urlStashIndex[0] + str(int(indexRange[i])) + stash_values.urlStashIndex[1] +str(league) + stash_values.urlStashIndex[2] + str(accountName)
+                        print 'Opening url: ' + url
+                        driver.get(url)
+                        pre = driver.find_element_by_tag_name("pre").text
+                        data = json.loads(pre)
+                        self.writeJson(data, league, int(indexRange[i])-1)
+                        print "Delay: " + str(delay) + ' sec'
+                        time.sleep(delay)
+                driver.quit()
+                print "\nComplete"
                 return
 
             #open first tab json
@@ -60,19 +98,19 @@ class getStash():
                 pre = driver.find_element_by_tag_name("pre").text
                 data = json.loads(pre)
                 self.writeJson(data, league, i)
-
+            print "\nComplete"
             driver.quit()
 
         except Exception, e:
                 print "Error: " + str(e)
         except KeyboardInterrupt:
             print 'Exit... (Keyboard Interrupt)'
-            driver.quit()
+            if driver: driver.quit()
             pass
 
     def writeJson(self, dump, name, stashNumber):
         try:
-            with open(str(stashNumber + 1) + '_' + str(name) +'.json', 'w') as outfile:
+            with open('outputJson\\' + str(stashNumber + 1) + '_' + str(name) +'.json', 'w') as outfile:
                 print 'Writing json file: ' + str(stashNumber + 1) + '_' + str(name) + '.json'
                 json.dump(dump, outfile)
                 print 'Saved: ' + str(stashNumber + 1) + '_' + str(name) + '.json\n'
@@ -95,10 +133,11 @@ def main(argv):
     league = None
     accountName = None
     character = None
+    indexRange = None
     try:
-        opts, args = getopt.getopt(argv,"c:l:a:d:",["character", "league", "accountName", "delay"])
+        opts, args = getopt.getopt(argv,"c:l:a:d:r:",["character", "league", "accountName", "delay", "indexRange"])
     except getopt.GetoptError:
-       print 'Usage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character>'
+       print 'Usage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character> -r <index range or specific index/indexes> (example: -r "[1-5, 7, 1]")'
        sys.exit(2)
     for opt, arg in opts:
       if opt in ("-l", "--league"):
@@ -109,21 +148,23 @@ def main(argv):
          delay = int(arg)
       elif opt in ("-c", "--character"):
          character = str(arg)
+      elif opt in ("-r", "--indexRange"):
+         indexRange = str(arg)
 
     if not league and not character:
         print '\nLeague not specified'
-        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character>'
+        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character> -r <index range or specific index/indexes> (example: -r "[1-5, 7, 1]")'
         sys.exit(2)
     if not accountName and not character:
         print '\nAccount name not specified'
-        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character>'
+        print '\nUsage: -l <league> -a <account name> -d <delay>(default: 5sec) optional -c <character> -r <index range or specific index/indexes> (example: -r "[1-5, 7, 1]")'
         sys.exit(2)
 
     config = loadConfig()
 
     if config:
         getStashInstance = getStash()
-        getStashInstance.getStashJson(league, accountName, character, delay, config['chromedriver_path'], config['user_profile_path'])
+        getStashInstance.getStashJson(league, accountName, character, delay, config['chromedriver_path'], config['user_profile_path'], indexRange)
 
 def loadConfig():
     try:
@@ -149,6 +190,29 @@ def verify():
     else:
         print 'user_profile_path defined'
     return res
+
+def query_yes_no(question, default="yes"):
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = raw_input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' "
+                             "(or 'y' or 'n').\n")
 
 if __name__ == "__main__":
     try:
