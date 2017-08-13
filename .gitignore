@@ -2,6 +2,7 @@
 *.zip
 build/
 dist*
+!dist.cmd
 release/
 *.spec
 MyStash/
